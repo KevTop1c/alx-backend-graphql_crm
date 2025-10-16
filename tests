@@ -1,0 +1,724 @@
+# ===========================================
+# FILTERING QUERIES - CUSTOMERS
+# ===========================================
+
+# Filter customers by name (partial match)
+query FilterCustomersByName {
+  allCustomers(filter: { nameIcontains: "Ali" }) {
+    id
+    name
+    email
+    phone
+    createdAt
+  }
+}
+
+# Filter customers by email
+query FilterCustomersByEmail {
+  allCustomers(filter: { emailIcontains: "example.com" }) {
+    id
+    name
+    email
+  }
+}
+
+# Filter customers by creation date range
+query FilterCustomersByDateRange {
+  allCustomers(filter: { 
+    createdAtGte: "2025-01-01T00:00:00Z"
+    createdAtLte: "2025-12-31T23:59:59Z"
+  }) {
+    id
+    name
+    email
+    createdAt
+  }
+}
+
+# Filter customers by phone pattern (e.g., US numbers starting with +1)
+query FilterCustomersByPhonePattern {
+  allCustomers(filter: { phonePattern: "+1" }) {
+    id
+    name
+    phone
+  }
+}
+
+# Combined filters with sorting
+query FilterAndSortCustomers {
+  allCustomers(
+    filter: { 
+      nameIcontains: "Ali"
+      createdAtGte: "2025-01-01T00:00:00Z"
+    }
+    orderBy: "-createdAt"
+  ) {
+    id
+    name
+    email
+    createdAt
+  }
+}
+
+# Sort customers by name (ascending)
+query SortCustomersAscending {
+  allCustomers(orderBy: "name") {
+    id
+    name
+    email
+  }
+}
+
+# Sort customers by creation date (descending)
+query SortCustomersDescending {
+  allCustomers(orderBy: "-createdAt") {
+    id
+    name
+    createdAt
+  }
+}
+
+# ===========================================
+# FILTERING QUERIES - PRODUCTS
+# ===========================================
+
+# Filter products by name
+query FilterProductsByName {
+  allProducts(filter: { nameIcontains: "Laptop" }) {
+    id
+    name
+    price
+    stock
+  }
+}
+
+# Filter products by price range
+query FilterProductsByPriceRange {
+  allProducts(filter: { 
+    priceGte: "100"
+    priceLte: "1000"
+  }) {
+    id
+    name
+    price
+    stock
+  }
+}
+
+# Filter products by stock range
+query FilterProductsByStockRange {
+  allProducts(filter: { 
+    stockGte: 10
+    stockLte: 100
+  }) {
+    id
+    name
+    stock
+  }
+}
+
+# Filter products with low stock (< 10)
+query FilterLowStockProducts {
+  allProducts(filter: { lowStock: true }) {
+    id
+    name
+    stock
+    price
+  }
+}
+
+# Filter products by exact stock
+query FilterProductsByExactStock {
+  allProducts(filter: { stock: 0 }) {
+    id
+    name
+    stock
+  }
+}
+
+# Combined filters with sorting by stock (descending)
+query FilterAndSortProducts {
+  allProducts(
+    filter: { 
+      priceGte: "100"
+      priceLte: "1000"
+    }
+    orderBy: "-stock"
+  ) {
+    id
+    name
+    price
+    stock
+  }
+}
+
+# Sort products by price (ascending)
+query SortProductsByPrice {
+  allProducts(orderBy: "price") {
+    id
+    name
+    price
+  }
+}
+
+# Sort products by name
+query SortProductsByName {
+  allProducts(orderBy: "name") {
+    id
+    name
+    price
+  }
+}
+
+# ===========================================
+# FILTERING QUERIES - ORDERS
+# ===========================================
+
+# Filter orders by total amount range
+query FilterOrdersByTotalAmount {
+  allOrders(filter: { 
+    totalAmountGte: "500"
+    totalAmountLte: "2000"
+  }) {
+    id
+    customer {
+      name
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# Filter orders by date range
+query FilterOrdersByDateRange {
+  allOrders(filter: { 
+    orderDateGte: "2025-01-01T00:00:00Z"
+    orderDateLte: "2025-12-31T23:59:59Z"
+  }) {
+    id
+    customer {
+      name
+    }
+    orderDate
+    totalAmount
+  }
+}
+
+# Filter orders by customer name
+query FilterOrdersByCustomerName {
+  allOrders(filter: { customerName: "Alice" }) {
+    id
+    customer {
+      id
+      name
+      email
+    }
+    products {
+      name
+      price
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# Filter orders by product name
+query FilterOrdersByProductName {
+  allOrders(filter: { productName: "Laptop" }) {
+    id
+    customer {
+      name
+    }
+    products {
+      id
+      name
+      price
+    }
+    totalAmount
+  }
+}
+
+# Filter orders by specific product ID
+query FilterOrdersByProductId {
+  allOrders(filter: { productId: 1 }) {
+    id
+    customer {
+      name
+    }
+    products {
+      id
+      name
+    }
+    totalAmount
+  }
+}
+
+# Filter orders by multiple product IDs
+query FilterOrdersByMultipleProductIds {
+  allOrders(filter: { productIds: "1,2,3" }) {
+    id
+    customer {
+      name
+    }
+    products {
+      id
+      name
+    }
+    totalAmount
+  }
+}
+
+# Combined filters: customer name, product name, and amount
+query FilterOrdersComplex {
+  allOrders(filter: { 
+    customerName: "Alice"
+    productName: "Laptop"
+    totalAmountGte: "500"
+  }) {
+    id
+    customer {
+      name
+      email
+    }
+    products {
+      name
+      price
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# Sort orders by total amount (descending)
+query SortOrdersByAmount {
+  allOrders(orderBy: "-totalAmount") {
+    id
+    customer {
+      name
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# Sort orders by date (most recent first)
+query SortOrdersByDate {
+  allOrders(orderBy: "-orderDate") {
+    id
+    customer {
+      name
+    }
+    orderDate
+    totalAmount
+  }
+}
+
+# ===========================================
+# RELAY CONNECTION QUERIES (PAGINATION)
+# ===========================================
+
+# Customers with pagination and filtering
+query CustomersConnectionWithFilters {
+  allCustomersConnection(
+    first: 10
+    nameIcontains: "Ali"
+    createdAtGte: "2025-01-01T00:00:00Z"
+  ) {
+    edges {
+      node {
+        id
+        name
+        email
+        phone
+        createdAt
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
+
+# Products with pagination and filtering
+query ProductsConnectionWithFilters {
+  allProductsConnection(
+    first: 10
+    priceGte: "100"
+    priceLte: "1000"
+    orderBy: "-stock"
+  ) {
+    edges {
+      node {
+        id
+        name
+        price
+        stock
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+# Orders with pagination and filtering
+query OrdersConnectionWithFilters {
+  allOrdersConnection(
+    first: 5
+    customerName: "Alice"
+    totalAmountGte: "500"
+  ) {
+    edges {
+      node {
+        id
+        customer {
+          name
+          email
+        }
+        products {
+          name
+          price
+        }
+        totalAmount
+        orderDate
+      }
+      cursor
+    }
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+  }
+}
+
+# ===========================================
+# ADVANCED FILTERING EXAMPLES
+# ===========================================
+
+# Find all customers who signed up this month
+query CustomersThisMonth {
+  allCustomers(filter: { 
+    createdAtGte: "2025-10-01T00:00:00Z"
+  }) {
+    id
+    name
+    email
+    createdAt
+  }
+}
+
+# Find products in specific price ranges (budget items)
+query BudgetProducts {
+  allProducts(filter: { 
+    priceLte: "100"
+  }) {
+    id
+    name
+    price
+    stock
+  }
+}
+
+# Find premium products (over $500)
+query PremiumProducts {
+  allProducts(filter: { 
+    priceGte: "500"
+  }) {
+    id
+    name
+    price
+  }
+}
+
+# Find out of stock products
+query OutOfStockProducts {
+  allProducts(filter: { stock: 0 }) {
+    id
+    name
+    price
+    stock
+  }
+}
+
+# Find large orders (over $1000)
+query LargeOrders {
+  allOrders(filter: { 
+    totalAmountGte: "1000"
+  }) {
+    id
+    customer {
+      name
+      email
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# Find orders for a specific customer by email
+query OrdersByCustomerEmail {
+  allOrders(filter: { customerEmail: "alice@example.com" }) {
+    id
+    customer {
+      name
+      email
+    }
+    products {
+      name
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# Find orders from the last 30 days with high value
+query RecentHighValueOrders {
+  allOrders(
+    filter: { 
+      orderDateGte: "2025-09-16T00:00:00Z"
+      totalAmountGte: "500"
+    }
+    orderBy: "-orderDate"
+  ) {
+    id
+    customer {
+      name
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# ===========================================
+# CREATE MUTATIONS (FROM PREVIOUS)
+# ===========================================
+
+# Create a single customer
+mutation CreateSingleCustomer {
+  createCustomer(input: {
+    name: "Alice"
+    email: "alice@example.com"
+    phone: "+1234567890"
+  }) {
+    customer {
+      id
+      name
+      email
+      phone
+    }
+    message
+    errors
+  }
+}
+
+# Bulk create customers
+mutation BulkCreateCustomers {
+  bulkCreateCustomers(input: [
+    { name: "Bob", email: "bob@example.com", phone: "123-456-7890" }
+    { name: "Carol", email: "carol@example.com" }
+    { name: "David", email: "david@example.com", phone: "+1-555-123-4567" }
+  ]) {
+    customers {
+      id
+      name
+      email
+    }
+    errors
+    successCount
+    failureCount
+  }
+}
+
+# Create products
+mutation CreateProducts {
+  laptop: createProduct(input: { name: "Laptop", price: "999.99", stock: 10 }) {
+    product { id name price }
+    message
+  }
+  mouse: createProduct(input: { name: "Mouse", price: "29.99", stock: 50 }) {
+    product { id name price }
+    message
+  }
+  keyboard: createProduct(input: { name: "Keyboard", price: "149.99", stock: 25 }) {
+    product { id name price }
+    message
+  }
+}
+
+# Create an order
+mutation CreateOrder {
+  createOrder(input: {
+    customerId: "1"
+    productIds: ["1", "2"]
+  }) {
+    order {
+      id
+      customer {
+        name
+        email
+      }
+      products {
+        name
+        price
+      }
+      totalAmount
+      orderDate
+    }
+    message
+    errors
+  }
+}
+
+# ===========================================
+# COMPLETE WORKFLOW WITH FILTERING
+# ===========================================
+
+# Step 1: Create test data
+mutation Step1CreateTestData {
+  bulkCreateCustomers(input: [
+    { name: "Alice Johnson", email: "alice@example.com", phone: "+1234567890" }
+    { name: "Bob Smith", email: "bob@example.com", phone: "+1987654321" }
+    { name: "Carol Williams", email: "carol@example.com" }
+  ]) {
+    successCount
+  }
+}
+
+mutation Step2CreateProducts {
+  laptop: createProduct(input: { name: "Laptop", price: "999.99", stock: 10 }) {
+    product { id }
+  }
+  mouse: createProduct(input: { name: "Wireless Mouse", price: "29.99", stock: 50 }) {
+    product { id }
+  }
+  monitor: createProduct(input: { name: "4K Monitor", price: "599.99", stock: 5 }) {
+    product { id }
+  }
+}
+
+mutation Step3CreateOrders {
+  order1: createOrder(input: { customerId: "1", productIds: ["1", "2"] }) {
+    order { id }
+  }
+  order2: createOrder(input: { customerId: "2", productIds: ["1", "3"] }) {
+    order { id }
+  }
+}
+
+# Step 2: Filter customers starting with "Ali"
+query Step4FilterCustomers {
+  allCustomers(filter: { nameIcontains: "Ali" }) {
+    id
+    name
+    email
+  }
+}
+
+# Step 3: Find products in price range $100-$1000
+query Step5FilterProducts {
+  allProducts(filter: { 
+    priceGte: "100"
+    priceLte: "1000"
+  }) {
+    id
+    name
+    price
+    stock
+  }
+}
+
+# Step 4: Find Alice's orders
+query Step6FilterAliceOrders {
+  allOrders(filter: { customerName: "Alice" }) {
+    id
+    customer {
+      name
+    }
+    products {
+      name
+      price
+    }
+    totalAmount
+  }
+}
+
+# Step 5: Find orders containing Laptop
+query Step7FindLaptopOrders {
+  allOrders(filter: { productName: "Laptop" }) {
+    id
+    customer {
+      name
+    }
+    products {
+      name
+    }
+    totalAmount
+  }
+}
+
+# Step 6: Find high-value orders (over $500)
+query Step8HighValueOrders {
+  allOrders(
+    filter: { totalAmountGte: "500" }
+    orderBy: "-totalAmount"
+  ) {
+    id
+    customer {
+      name
+    }
+    totalAmount
+    orderDate
+  }
+}
+
+# ===========================================
+# VERIFICATION QUERIES
+# ===========================================
+
+# Get all data for verification
+query VerifyAllData {
+  customers: allCustomers {
+    id
+    name
+    email
+    phone
+  }
+  
+  products: allProducts {
+    id
+    name
+    price
+    stock
+  }
+  
+  orders: allOrders {
+    id
+    customer {
+      name
+    }
+    products {
+      name
+    }
+    totalAmount
+  }
+}
+
+# Count queries
+query CountRecords {
+  allCustomers {
+    id
+  }
+  allProducts {
+    id
+  }
+  allOrders {
+    id
+  }
+}
