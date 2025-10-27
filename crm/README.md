@@ -1,14 +1,14 @@
 # CRM Setup Instructions
 
 1. Install Redis and dependencies.
-2. Run migrations using: python manage.py migrate
-3. Start Celery worker: celery -A crm worker -l info
-4. Start Celery Beat: celery -A crm beat -l info
-5. Verify logs in /tmp/crm_report_log.txt
+2. Run migrations using: `python manage.py migrate`
+3. Start Celery worker: `celery -A crm worker -l info`
+4. Start Celery Beat: `celery -A crm beat -l info`
+5. Verify logs in `/tmp/crm_report_log.txt`
 
 ---
 
-### Step 1: Install Redis and dependencies
+### Install Redis and dependencies
 #### On Ubuntu/Debian:
 ```bash
 sudo apt-get update
@@ -77,7 +77,7 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 ```
 ---
 
-### Step 2: Run migrations
+### Run migrations
 Run migrations to create the necessary database tables for Celery Beat:
 ```bash
 python manage.py migrate
@@ -97,7 +97,7 @@ The GraphQL endpoint should be available at http://localhost:8000/graphql
 
 ---
 
-### Step 3: Start Celery worker
+### Start Celery worker
 In a second terminal window:
 ```bash
 celery -A crm worker -l info
@@ -131,7 +131,7 @@ You should see output like:
 
 ---
 
-### Step 4: Start Celery Beat
+### Start Celery Beat
 In a third terminal window:
 ```bash
 celery -A crm beat -l info
@@ -153,7 +153,7 @@ Celery Beat will now schedule the `generate_crm_report` task to run every Monday
 
 ---
 
-### Step 5: Verify logs
+### Verify logs
 Check the report log file:
 ```bash
 cat /tmp/crm_report_log.txt
