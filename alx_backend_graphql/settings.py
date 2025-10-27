@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "graphene_django",
     "django_filters",
+    "django_crontab",
     "crm",
 ]
 
@@ -126,3 +127,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # GraphQL settings
 GRAPHENE = {"SCHEMA": "alx_backend_graphql.schema.schema"}
+
+# Django-crontab configuration
+CRONJOBS = [
+    # Log heartbeat every 5 minutes
+    ('*/5 * * * *', 'crm.cron_jobs.cron.log_crm_heartbeat'),
+]
+
+# Optional: Configure crontab settings
+CRONTAB_LOCK_JOBS = True  # Prevent job from running multiple times simultaneously
+CRONTAB_COMMAND_SUFFIX = '2>&1'  # Redirect stderr to stdout for logging
