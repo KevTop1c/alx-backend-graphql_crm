@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
 
-from .models import Customer, Product, Order
+from crm.models import Customer, Product, Order
 from .filters import CustomerFilter, ProductFilter, OrderFilter
 
 
