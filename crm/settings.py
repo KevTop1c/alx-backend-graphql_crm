@@ -132,6 +132,7 @@ GRAPHENE = {"SCHEMA": "alx_backend_graphql.schema.schema"}
 CRONJOBS = [
     # Log heartbeat every 5 minutes
     ('*/5 * * * *', 'crm.cron.log_crm_heartbeat'),
+    ('0 */12 * * *', 'crm.cron.update_low_stock'),
 ]
 
 # Optional: Configure crontab settings
