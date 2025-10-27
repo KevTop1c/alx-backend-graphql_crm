@@ -189,3 +189,140 @@ python manage.py shell
 - Go to "Periodic Tasks" under "DJANGO_CELERY_BEAT"
 - View or modify the scheduled tasks
 - You can also manually trigger tasks from here
+
+### Celery Beat Schedule Configuration
+The task is scheduled with the following crontab expression:
+```python
+crontab(day_of_week='mon', hour=6, minute=0)
+```
+This means:
+- Day of week: Monday (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+- Hour: 6 (6:00 AM)
+- Minute: 0
+
+### Modify the Schedule
+To change the schedule, update CELERY_BEAT_SCHEDULE in settings.py:
+```python
+# Run every day at midnight
+'schedule': crontab(hour=0, minute=0),
+
+# Run every Sunday at 9:00 AM
+'schedule': crontab(day_of_week='sun', hour=9, minute=0),
+
+# Run every 6 hours
+'schedule': crontab(minute=0, hour='*/6'),
+
+# Run on the 1st of every month at 7:00 AM
+'schedule': crontab(minute=0, hour=7, day_of_month='1'),
+```
+
+After changing the schedule, restart Celery Beat:
+```bash
+# Stop with Ctrl+C, then restart
+celery -A crm beat -l info
+```
+
+## Monitoring and Management
+### Check Task Status
+```bash
+celery -A crm inspect active
+celery -A crm inspect scheduled
+celery -A crm inspect registered
+```
+
+### View Worker Stats
+```bash
+celery -A crm inspect stats
+```
+
+### Purge All Tasks
+```bash
+celery -A crm purge
+```
+
+### Control Workers
+```bash
+# Gracefully shutdown workers
+celery -A crm control shutdown
+
+# Restart worker pool
+celery -A crm control pool_restart
+```
+
+## Troubleshooting
+### Redis Connection Issues
+**Problem:** `Error: Can't connect to Redis`
+#### Solution:
+**1. Check if Redis is running:**
+```bash   
+redis-cli ping
+```
+
+**2. Verify Redis URL in settings:**
+```python
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+```
+
+### Task Not Executing
+**Problem:** Task scheduled but not executing
+#### Solutions:
+1. Ensure both Celery worker AND Celery Beat are running
+2. Check worker logs for errors
+3. Verify Django server is running on `localhost:8000`
+4. Check the database for scheduled tasks:
+```bash
+python manage.py shell
+```
+```python
+>>> from django_celery_beat.models import PeriodicTask
+>>> print(PeriodicTask.objects.all())
+```
+
+### GraphQL Endpoint Not Responding
+**Problem:** Report shows GraphQL connection errors
+#### Solutions:
+1. Verify Django server is running
+2. Test GraphQL endpoint manually:
+```bash   
+curl -X POST http://localhost:8000/graphql \
+     -H "Content-Type: application/json" \
+     -d '{"query":"{ allCustomers { id } }"}'
+```
+3. Check for authentication requirements
+
+### Permission Issues with Log File
+**Problem:** `IOError: Permission denied: /tmp/crm_report_log.txt`
+#### Solution:
+1. Check file permissions:
+```bash
+ls -la /tmp/crm_report_log.txt
+```
+
+2. Ensure the user running Celery has write access:
+```bash
+sudo chmod 666 /tmp/crm_report_log.txt
+```
+
+## Summary of Commands
+```bash
+# Installation
+pip install -r requirements.txt
+python manage.py migrate
+
+# Start services
+python manage.py runserver                  # Terminal 1
+celery -A crm worker -l info                # Terminal 2
+celery -A crm beat -l info                  # Terminal 3
+
+# Testing
+python manage.py shell -c "from crm.tasks import generate_crm_report; generate_crm_report()"
+
+# Monitoring
+tail -f /tmp/crm_report_log.txt
+celery -A crm inspect active
+celery -A crm inspect scheduled
+
+# Management
+celery -A crm control shutdown
+celery -A crm purge
+```
