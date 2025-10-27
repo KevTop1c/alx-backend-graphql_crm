@@ -10,7 +10,9 @@ This guide explains how to set up and run Celery with Celery Beat for automated 
 4. Start Celery Beat: `celery -A crm beat -l info`
 5. Verify logs in `/tmp/crm_report_log.txt`
 
-### 1. Install Redis
+---
+
+### Step 1: Install Redis
 ### On Ubuntu/Debian:
 ```bash
 sudo apt-get update
@@ -39,7 +41,7 @@ redis-cli ping
 # Should return: PONG
 ```
 
-### 2. Install Dependencies
+### Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -48,7 +50,7 @@ This will install:
 - `django-celery-beat>=2.5.0`
 - `redis>=5.0.0`
 
-### 3. Update Django Settings
+### Update Django Settings
 Add the following to your `crm/settings.py`:
 ```python
 from celery.schedules import crontab
@@ -77,8 +79,9 @@ CELERY_BEAT_SCHEDULE = {
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 ```
+---
 
-### 4. Run Database Migrations
+### Step 2: Run Database Migrations
 Run migrations to create the necessary database tables for Celery Beat:
 ```bash
 python manage.py migrate
@@ -96,7 +99,9 @@ python manage.py runserver
 ```
 The GraphQL endpoint should be available at http://localhost:8000/graphql
 
-### 6. Start Celery Worker
+---
+
+### Step 3: Start Celery Worker
 In a second terminal window:
 ```bash
 celery -A crm worker -l info
@@ -128,7 +133,9 @@ You should see output like:
 [2024-10-27 10:00:01,000: INFO/MainProcess] celery@hostname ready.
 ```
 
-### 7. Start Celery Beat
+---
+
+### Step 4: Start Celery Beat
 In a third terminal window:
 ```bash
 celery -A crm beat -l info
@@ -148,7 +155,9 @@ Configuration ->
 ```
 Celery Beat will now schedule the `generate_crm_report` task to run every Monday at 6:00 AM.
 
-### 8. Verify Logs
+---
+
+### Step 5: Verify Logs
 Check the report log file:
 ```bash
 cat /tmp/crm_report_log.txt
@@ -163,6 +172,8 @@ Monitor the log file in real-time:
 ```bash
 tail -f /tmp/crm_report_log.txt
 ```
+
+---
 
 ### Manual Task Execution (Testing)
 ### Test the Task Directly (Python Shell):
