@@ -131,7 +131,7 @@ GRAPHENE = {"SCHEMA": "alx_backend_graphql.schema.schema"}
 # Django-crontab configuration
 CRONJOBS = [
     # Log heartbeat every 5 minutes
-    ('*/5 * * * *', 'crm.cron_jobs.cron.log_crm_heartbeat'),
+    ('*/5 * * * *', 'crm.cron.log_crm_heartbeat'),
 ]
 
 # Optional: Configure crontab settings
