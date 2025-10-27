@@ -2,6 +2,8 @@
 
 from datetime import datetime
 import requests
+from gql import gql, Client
+from gql.transport.requests import RequestsHTTPTransport
 
 
 # pylint: disable=unspecified-encoding
@@ -16,30 +18,30 @@ def log_crm_heartbeat():
 
     graphql_status = ""
     try:
-        # Query a simple field to verify GraphQL endpoint is responsive
-        response = requests.post(
-            "http://localhost:8000/graphql",
-            json={
-                "query": """
-                    query {
-                        __schema {
-                            queryType {
-                                name
-                            }
-                        }
-                    }
-                """
-            },
-            timeout=5,
+        # Set up GraphQL transport
+        transport = RequestsHTTPTransport(
+            url="http://localhost:8000/graphql",
+            verify=False,
+            retries=3,
         )
 
-        if response.status_code == 200:
+        # Initialize the GraphQL client
+        client = Client(transport=transport, fetch_schema_from_transport=False)
+
+        # Minimal query to test endpoint responsiveness
+        query = gql(
+            """
+            query {
+                __typename
+            }
+            """
+        )
+
+        result = client.execute(query)
+        if result.get("__typename"):
             graphql_status = " - GraphQL endpoint responsive"
         else:
-            graphql_status = (
-                f" - GraphQL endpoint returned status {response.status_code}"
-            )
-
+            graphql_status = " - GraphQL endpoint responded but with unexpected data"
     except requests.exceptions.RequestException as e:
         graphql_status = f" - GraphQL endpoint unreachable: {str(e)}"
 
