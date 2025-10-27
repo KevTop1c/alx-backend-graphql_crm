@@ -13,7 +13,7 @@ This guide explains how to set up and run Celery with Celery Beat for automated 
 ---
 
 ### Step 1: Install Redis
-### On Ubuntu/Debian:
+#### On Ubuntu/Debian:
 ```bash
 sudo apt-get update
 sudo apt-get install redis-server
@@ -21,13 +21,13 @@ sudo systemctl start redis
 sudo systemctl enable redis
 ```
 
-### On macOS (using Homebrew):
+#### On macOS (using Homebrew):
 ```bash
 brew install redis
 brew services start redis
 ```
 
-### On Windows:
+#### On Windows:
 Download and install Redis from: https://github.com/microsoftarchive/redis/releases
 
 #### Or use Docker:
@@ -35,13 +35,13 @@ Download and install Redis from: https://github.com/microsoftarchive/redis/relea
 docker run -d -p 6379:6379 redis:latest
 ```
 
-### Verify Redis is Running:
+#### Verify Redis is Running:
 ```bash
 redis-cli ping
 # Should return: PONG
 ```
 
-### Install Dependencies
+#### Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -50,7 +50,7 @@ This will install:
 - `django-celery-beat>=2.5.0`
 - `redis>=5.0.0`
 
-### Update Django Settings
+#### Update Django Settings
 Add the following to your `crm/settings.py`:
 ```python
 from celery.schedules import crontab
@@ -92,7 +92,7 @@ This creates tables for:
 - `django_celery_beat_crontabschedule`
 - And other Celery Beat related tables
 
-### 5. Start the Django Development Server
+#### Start the Django Development Server
 In one terminal window:
 ```bash
 python manage.py runserver
