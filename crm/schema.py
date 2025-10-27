@@ -65,7 +65,6 @@ class OrderType(DjangoObjectType):
             "products",
             "order_date",
             "total_amount",
-            "created_at",
         )
         filterset_class = OrderFilter
         interfaces = (graphene.relay.Node,)
@@ -100,7 +99,6 @@ class OrderTypeStandard(DjangoObjectType):
             "products",
             "order_date",
             "total_amount",
-            "created_at",
         )
 
 
