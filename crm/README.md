@@ -322,6 +322,9 @@ tail -f /tmp/crm_report_log.txt
 celery -A crm inspect active
 celery -A crm inspect scheduled
 
+# Verify logs
+cat /tmp/crm_report_log.txt
+
 # Management
 celery -A crm control shutdown
 celery -A crm purge
