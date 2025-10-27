@@ -9,8 +9,8 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 
-
-from crm.models import Customer, Product, Order
+from crm.models import Product
+from crm.models import Customer, Product, Order  # pylint: disable=reimported
 from .filters import CustomerFilter, ProductFilter, OrderFilter
 
 
