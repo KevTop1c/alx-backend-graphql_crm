@@ -12,7 +12,7 @@ This guide explains how to set up and run Celery with Celery Beat for automated 
 
 ---
 
-### Step 1: Install Redis
+### Step 1: Install Redis and dependencies
 #### On Ubuntu/Debian:
 ```bash
 sudo apt-get update
@@ -81,7 +81,7 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 ```
 ---
 
-### Step 2: Run Database Migrations
+### Step 2: Run migrations
 Run migrations to create the necessary database tables for Celery Beat:
 ```bash
 python manage.py migrate
@@ -101,7 +101,7 @@ The GraphQL endpoint should be available at http://localhost:8000/graphql
 
 ---
 
-### Step 3: Start Celery Worker
+### Step 3: Start Celery worker
 In a second terminal window:
 ```bash
 celery -A crm worker -l info
@@ -157,7 +157,7 @@ Celery Beat will now schedule the `generate_crm_report` task to run every Monday
 
 ---
 
-### Step 5: Verify Logs
+### Step 5: Verify logs
 Check the report log file:
 ```bash
 cat /tmp/crm_report_log.txt
