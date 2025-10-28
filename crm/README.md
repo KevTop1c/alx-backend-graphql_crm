@@ -1,4 +1,5 @@
 ## Setup Steps
+
 - Install Redis and dependencies.
 - Run migrations (python manage.py migrate).
 - Start Celery worker (celery -A crm worker -l info).
