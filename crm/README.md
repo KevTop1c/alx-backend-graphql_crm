@@ -1,5 +1,5 @@
 ## Setup Steps
-1. Install Redis and dependencies
+1. InstallRedis and dependencies
 2. Run migrations using: `python manage.py migrate`
 3. Start Celery worker: `celery -A crm worker -l info`
 4. Start Celery Beat: `celery -A crm beat -l info`
