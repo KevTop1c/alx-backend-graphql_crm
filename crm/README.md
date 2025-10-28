@@ -1,15 +1,61 @@
-# CRM Setup Instructions
+# CRM Application – Celery Setup Guide ✅
+This project is a Django-based CRM system with automated weekly report generation using Celery, Redis, and Celery Beat. The report runs every Monday at 6:00 AM and logs CRM metrics (customers, orders, revenue).
 
-1. Install Redis and dependencies.
-2. Run migrations using: `python manage.py migrate`
-3. Start Celery worker: `celery -A crm worker -l info`
-4. Start Celery Beat: `celery -A crm beat -l info`
-5. Verify logs in `/tmp/crm_report_log.txt`
+## ✅ Prerequistes
+| Dependency         | Version |
+| ------------------ | ------- |
+| Python             | 3.10+   |
+| Django             | 4.x     |
+| Redis              | Latest  |
+| Celery             | 5.3+    |
+| django-celery-beat | 2.5+    |
 
 ---
 
-### Install Redis and dependencies
-#### On Ubuntu/Debian:
+## ✅ Installation & Setup
+### 1️⃣ Clone the project
+```bash
+git clone https://github.com/<your-org>/<your-repo>.git
+cd crm
+```
+
+### 2️⃣ Create and activate a virtual environment
+```bash
+python3 -m venv venv
+source venv/bin/activate       # macOS/Linux
+venv\Scripts\activate          # Windows
+```
+
+### 3️⃣ Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## ✅ Environment Variables
+Create `.env` file in the project root:
+```bash
+cp .env.example .env
+```
+
+Example .env content:
+```bash
+SECRET_KEY=your_secret_key
+DEBUG=True
+REDIS_URL=redis://localhost:6379/0
+```
+
+---
+
+## ✅ Redis Installation
+### On macOS (using Homebrew):
+```bash
+brew install redis
+brew services start redis
+```
+
+### On Ubuntu/Debian:
 ```bash
 sudo apt-get update
 sudo apt-get install redis-server
@@ -17,27 +63,21 @@ sudo systemctl start redis
 sudo systemctl enable redis
 ```
 
-#### On macOS (using Homebrew):
-```bash
-brew install redis
-brew services start redis
-```
-
-#### On Windows:
+### On Windows:
 Download and install Redis from: https://github.com/microsoftarchive/redis/releases
 
-#### Or use Docker:
+### Or use Docker:
 ```bash
 docker run -d -p 6379:6379 redis:latest
 ```
 
-#### Verify Redis is Running:
+### Verify Redis is Running:
 ```bash
 redis-cli ping
 # Should return: PONG
 ```
 
-#### Install Dependencies
+### Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
@@ -46,127 +86,70 @@ This will install:
 - `django-celery-beat>=2.5.0`
 - `redis>=5.0.0`
 
-#### Update Django Settings
-Add the following to your `crm/settings.py`:
-```python
-from celery.schedules import crontab
+--- 
 
-INSTALLED_APPS = [
-    # ... other apps
-    'django_celery_beat',
-    'crm',
-]
-
-# Celery Configuration
+## ✅ Update Django Settings (already included in project)
+Confirm these exist inside `crm/settings.py`:
+```bash
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-CELERY_TIMEZONE = 'UTC'
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_ACCEPT_CONTENT = ['json']
-
-# Celery Beat Schedule
-CELERY_BEAT_SCHEDULE = {
-    'generate-crm-report': {
-        'task': 'crm.tasks.generate_crm_report',
-        'schedule': crontab(day_of_week='mon', hour=6, minute=0),
-    },
-}
-
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 ```
+
 ---
 
-### Run migrations
+## ✅ Database Migrations
 Run migrations to create the necessary database tables for Celery Beat:
 ```bash
 python manage.py migrate
 ```
-This creates tables for:
-- `django_celery_beat_periodictask`
-- `django_celery_beat_intervalschedule`
-- `django_celery_beat_crontabschedule`
-- And other Celery Beat related tables
 
-#### Start the Django Development Server
-In one terminal window:
-```bash
-python manage.py runserver
-```
-The GraphQL endpoint should be available at http://localhost:8000/graphql
+--- 
 
----
+## ✅ Start the Application Services
+Open 3 terminal windows:
+| Terminal | Command                        | Purpose         |
+| -------- | ------------------------------ | --------------- |
+| 1        | `python manage.py runserver`   | Starts Django   |
+| 2        | `celery -A crm worker -l info` | Executes tasks  |
+| 3        | `celery -A crm beat -l info`   | Schedules tasks |
 
-### Start Celery worker
-In a second terminal window:
-```bash
-celery -A crm worker -l info
-```
-You should see output like:
-```
--------------- celery@hostname v5.3.x (emerald-rush)
---- ***** ----- 
--- ******* ---- Linux-x.x.x-x-generic-x86_64-with-glibc2.x
-- *** --- * --- 
-- ** ---------- [config]
-- ** ---------- .> app:         crm:0x...
-- ** ---------- .> transport:   redis://localhost:6379/0
-- ** ---------- .> results:     redis://localhost:6379/0
-- *** --- * --- .> concurrency: 8 (prefork)
--- ******* ---- .> task events: OFF
---- ***** ----- 
--------------- [queues]
-               .> celery           exchange=celery(direct) key=celery
-               
-
-[tasks]
-  . crm.celery.debug_task
-  . crm.tasks.generate_crm_report
-
-[2024-10-27 10:00:00,000: INFO/MainProcess] Connected to redis://localhost:6379/0
-[2024-10-27 10:00:00,000: INFO/MainProcess] mingle: searching for neighbors
-[2024-10-27 10:00:01,000: INFO/MainProcess] mingle: all alone
-[2024-10-27 10:00:01,000: INFO/MainProcess] celery@hostname ready.
-```
+GraphQL Endpoint:
+➡️ http://localhost:8000/graphql
 
 ---
 
-### Start Celery Beat
-In a third terminal window:
+## ✅ Verify the Report Task is Working
+Manually trigger once:
 ```bash
-celery -A crm beat -l info
+python manage.py shell -c "from crm.tasks import generate_crm_report; generate_crm_report()"
 ```
-You should see output like:
-```
-celery beat v5.3.x (emerald-rush) is starting.
-__    -    ... __   -        _
-LocalTime -> 2024-10-27 10:00:00
-Configuration ->
-    . broker -> redis://localhost:6379/0
-    . loader -> celery.loaders.app.AppLoader
-    . scheduler -> django_celery_beat.schedulers.DatabaseScheduler
-    . db -> default
-    . logfile -> [stderr]@%INFO
-    . maxinterval -> 5.00 seconds (5s)
-```
-Celery Beat will now schedule the `generate_crm_report` task to run every Monday at 6:00 AM.
 
----
-
-### Verify logs
-Check the report log file:
-```bash
+Check logs:
+```
 cat /tmp/crm_report_log.txt
-```
-You should see entries like:
-```
-2024-10-27 06:00:00 - Report: 150 customers, 320 orders, 45230.50 revenue.
-2024-11-03 06:00:00 - Report: 165 customers, 340 orders, 48750.75 revenue.
+tail -f /tmp/crm_report_log.txt
 ```
 
-Monitor the log file in real-time:
+Expected output:
+```yaml
+2024-10-27 06:00:00 - Report: 150 customers, 320 orders, 45230.50 revenue.
+```
+
+---
+
+## ✅ Admin Monitoring Commands
 ```bash
-tail -f /tmp/crm_report_log.txt
+celery -A crm inspect active
+celery -A crm inspect scheduled
+celery -A crm purge
+celery -A crm control shutdown
+```
+
+---
+
+## ✅ Running Tests
+```bash
+python manage.py test
 ```
 
 ---
