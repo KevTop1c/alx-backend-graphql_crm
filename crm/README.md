@@ -1,6 +1,6 @@
 # CRM Application Setup
 
-## Install Redis and Dependencies
+## Step 1: Install Redis and Dependencies
 
 ### Install Redis
 
@@ -32,25 +32,25 @@ redis-cli ping
 pip install -r requirements.txt
 ```
 
-## Run Migrations
+## Step 2: Run Migrations
 
 ```bash
 python manage.py migrate
 ```
 
-## Start Celery Worker
+## Step 3: Start Celery Worker
 
 ```bash
 celery -A crm worker -l info
 ```
 
-## Start Celery Beat
+## Step 4: Start Celery Beat
 
 ```bash
 celery -A crm beat -l info
 ```
 
-## Verify Logs
+## Step 5: Verify Logs
 
 Check the logs in `/tmp/crm_report_log.txt`:
 
